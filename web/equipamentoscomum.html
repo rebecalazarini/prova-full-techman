@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipamentos - Usuário Comum</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef2f3;
+    }
+
+    header {
+      background: #44babc;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #35797d;
+      color: white;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .equipamento {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .equipamento h2 {
+      margin: 0 0 10px 0;
+    }
+
+    .comentarios {
+      margin-top: 10px;
+      padding-left: 15px;
+    }
+
+    .comentario {
+      background: #f0f0f0;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      border-radius: 5px;
+    }
+
+    .ver-comentarios {
+      margin-top: 10px;
+      background: #44babc;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Equipamentos</h1>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main id="equipamentos-list">
+
+  </main>
+
+  <script>
+    async function fetchEquipamentos() {
+      try {
+        const response = await fetch("http://localhost:3000/equipamento");
+        const equipamentos = await response.json();
+        const list = document.getElementById("equipamentos-list");
+        list.innerHTML = "";
+
+        equipamentos.forEach(e => {
+          const div = document.createElement("div");
+          div.className = "equipamento";
+
+          div.innerHTML = `
+            <h2>${e.nome}</h2>
+            <p>Descrição: ${e.descricao}</p>
+            <p>Local: ${e.localizacao}</p>
+            <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
+            <div class="comentarios" style="display:none;">
+              ${e.Comentario.map(c => `<div class="comentario">${c.texto}</div>`).join('')}
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar equipamentos:", error);
+      }
+    }
+
+    function toggleComentarios(btn) {
+      const comentarios = btn.nextElementSibling;
+      comentarios.style.display = comentarios.style.display === "none" ? "block" : "none";
+    }
+
+    function logout() {
+      // Redireciona para a página de login
+      window.location.href = "index.html";
+    }
+
+    fetchEquipamentos();
+  </script>
+</body>
+</html>
