@@ -25,7 +25,7 @@ const login = async (req, res) => {
     const { id, senha } = req.body;
 
     const usuario = await prisma.usuario.findUnique({
-        where: { id: Number(id) }, // Garantir que seja number
+        where: { id: Number(id) }, 
         select: { id: true, senha: true, perfil: true }
     });
 
@@ -33,8 +33,8 @@ const login = async (req, res) => {
         return res.status(401).json({ error: "Usuário não encontrado" });
     }
 
-    // Comparação de senha em texto puro
-    if (usuario.senha !== senha.trim()) { // remover espaços extras
+
+    if (usuario.senha !== senha.trim()) { 
         return res.status(401).json({ error: "Senha incorreta" });
     }
 

@@ -3,11 +3,11 @@ const prisma = new PrismaClient();
 const fs = require('fs');
 const path = require('path');
 
-// Função para ler CSV
+
 function lerCSV(caminho) {
   return fs.readFileSync(caminho, 'utf8')
     .split(/\r?\n/)
-    .filter((linha, i) => i > 0 && linha) // pula header
+    .filter((linha, i) => i > 0 && linha) 
     .map(linha => linha.split(';').map(campo => campo.trim()));
 }
 
@@ -64,18 +64,15 @@ async function insereComentarios() {
   return linhas.length;
 }
 
-// Função principal para rodar direto no terminal
 (async () => {
   try {
     await prisma.$connect();
 
-    // Deletar dados antigos
     await prisma.comentario.deleteMany();
     await prisma.equipamento.deleteMany();
     await prisma.usuario.deleteMany();
     await prisma.perfil.deleteMany();
 
-    // Inserir dados
     const perfis = await inserePerfis();
     const usuarios = await insereUsuarios();
     const equipamentos = await insereEquipamentos();
