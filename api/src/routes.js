@@ -4,10 +4,6 @@ const router = express.Router();
 const Comentarios = require('./controllers/comentarios');
 const Equipamento = require('./controllers/equipamentos');
 const Usuario = require('./controllers/usuarios');
-const Seed = require('./controllers/seed');
-
-
-router.post('/seed', Seed.run);
 
 router.get('/', (req, res) => {
     return res.json({
