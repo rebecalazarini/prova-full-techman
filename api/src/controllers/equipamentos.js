@@ -21,28 +21,30 @@ const read = async (req, res) => {
 };
 
 const del = async (req, res) => {
-    const equipamento = await prisma.equipamento.update({
-        where: {
-            id: parseInt(req.params.id)
-        },
-        data: {
-            ativo: 0
-        }
-    });
-    return res.json(equipamento);
+    try {
+        const equipamento = await prisma.equipamento.update({
+            where: {
+                id: parseInt(req.params.id)
+            },
+            data: {
+                ativo: 0
+            }
+        });
+        return res.json(equipamento);
+    } catch (error) {
+        return res.status(400).json({ error: 'Erro ao deletar equipamento', details: error.message });
+    }
 };
 
 const create = async (req, res) => {
-    const { equipamento, descricao, imagem, ativo } = req.body;
-    const equipament = await prisma.equipamento.create({
-        data: {
-            equipamento,
-            descricao,
-            imagem,
-            ativo
-        }
-    });
-    return res.status(201).json(equipament);
+    try {
+        const equipament = await prisma.equipamento.create({
+            data: req.body
+        });
+        return res.status(201).json(equipament);
+    } catch (error) {
+        return res.status(400).json({ error: 'Erro ao criar equipamento', details: error.message });
+    }
 }
 
 module.exports = {

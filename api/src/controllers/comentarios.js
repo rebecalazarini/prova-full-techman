@@ -20,15 +20,14 @@ const read = async (req, res) => {
 };
 
 const create = async (req, res) => {
-    const { equipamento, perfil, comentario } = req.body;
-    const coment = await prisma.comentario.create({
-        data: {
-            equipamento: parseInt(equipamento),
-            perfil: parseInt(perfil),
-            comentario: comentario
-        }
-    });
-    return res.status(201).json(coment).end();
+    try {
+        const coment = await prisma.comentario.create({
+            data: req.body
+        });
+        return res.status(201).json(coment).end();
+    } catch (error) {
+        return res.status(400).json({ error: 'Erro ao criar comentário', details: error.message });
+    }
 };
 
 module.exports = {
