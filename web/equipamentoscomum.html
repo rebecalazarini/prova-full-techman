@@ -89,44 +89,44 @@
   </main>
 
   <script>
-    async function fetchEquipamentos() {
-      try {
-        const response = await fetch("http://localhost:3000/equipamento"); // ou "http://localhost:3000/equipamento"
-        const equipamentos = await response.json();
-        const list = document.getElementById("equipamentos-list");
-        list.innerHTML = "";
+   async function fetchEquipamentos() {
+  try {
+    const response = await fetch("http://localhost:3000/equipamento");
+    const equipamentos = await response.json();
+    const list = document.getElementById("equipamentos-list");
+    list.innerHTML = "";
 
-        equipamentos.forEach(e => {
-          const div = document.createElement("div");
-          div.className = "equipamento";
+    equipamentos.forEach(e => {
+      const div = document.createElement("div");
+      div.className = "equipamento";
 
-          div.innerHTML = `
-            <h2>${e.equipamento}</h2>
-            <img src="${e.imagem}" alt="${e.equipamento}">
-            <p>${e.descricao}</p>
-            <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
-            <div class="comentarios" style="display:none;">
-              ${e.comentarios.map(c => `<div class="comentario">${c.comentario}</div>`).join('')}
-            </div>
-          `;
+      div.innerHTML = `
+        <h2>${e.equipamento}</h2>
+        <img src="${e.imagem}" alt="${e.equipamento}">
+        <p>${e.descricao}</p>
+        <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
+        <div class="comentarios" style="display:none;">
+          ${(e.comentarios || []).map(c => `<div class="comentario">${c.comentario}</div>`).join('')}
+        </div>
+      `;
 
-          list.appendChild(div);
-        });
-      } catch (error) {
-        console.error("Erro ao carregar equipamentos:", error);
-      }
-    }
+      list.appendChild(div);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar equipamentos:", error);
+  }
+}
 
-    function toggleComentarios(btn) {
-      const comentarios = btn.nextElementSibling;
-      comentarios.style.display = comentarios.style.display === "none" ? "block" : "none";
-    }
+function toggleComentarios(btn) {
+  const comentarios = btn.nextElementSibling;
+  comentarios.style.display = comentarios.style.display === "none" ? "block" : "none";
+}
 
-    function logout() {
-      window.location.href = "index.html"; // volta para a página de login
-    }
+function logout() {
+  window.location.href = "index.html"; 
+}
 
-    fetchEquipamentos();
+fetchEquipamentos();
   </script>
 </body>
 </html>

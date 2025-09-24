@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const prisma = new PrismaClient();
 
 const Comentarios = require('./controllers/comentarios');
 const Equipamento = require('./controllers/equipamentos');
@@ -37,4 +38,22 @@ router.delete('/equipamento/:id', Equipamento.del);
 
 router.post('/comentarios', Comentarios.create);
 router.get('/comentarios', Comentarios.read);
+
+
+router.get('/equipamento', async (req, res) => {
+  try {
+    const equipamentos = await prisma.equipamento.findMany({
+      where: { ativo: 1 },
+      include: { comentarios: true },
+      orderBy: { data: 'desc' }
+    });
+    res.json(equipamentos);
+  } catch (err) {
+    console.error('Erro ao buscar equipamentos:', err);
+    res.status(500).json({ error: 'Erro ao buscar equipamentos' });
+  }
+});
+
+
+
 module.exports = router;
