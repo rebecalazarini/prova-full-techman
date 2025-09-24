@@ -8,7 +8,6 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
       background: #eef2f3;
     }
 
@@ -37,7 +36,7 @@
 
     main {
       padding: 20px;
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
@@ -45,12 +44,15 @@
       background: white;
       border-radius: 8px;
       padding: 15px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .equipamento h2 {
-      margin: 0 0 10px 0;
+    .equipamento img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      margin-bottom: 10px;
     }
 
     .comentarios {
@@ -74,7 +76,6 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
   </style>
 </head>
 <body>
@@ -84,13 +85,13 @@
   </header>
 
   <main id="equipamentos-list">
-
+    <!-- Lista de equipamentos será renderizada aqui -->
   </main>
 
   <script>
     async function fetchEquipamentos() {
       try {
-        const response = await fetch("http://localhost:3000/equipamento");
+        const response = await fetch("http://localhost:3000/equipamento"); // ou "http://localhost:3000/equipamento"
         const equipamentos = await response.json();
         const list = document.getElementById("equipamentos-list");
         list.innerHTML = "";
@@ -100,14 +101,15 @@
           div.className = "equipamento";
 
           div.innerHTML = `
-            <h2>${e.nome}</h2>
-            <p>Descrição: ${e.descricao}</p>
-            <p>Local: ${e.localizacao}</p>
+            <h2>${e.equipamento}</h2>
+            <img src="${e.imagem}" alt="${e.equipamento}">
+            <p>${e.descricao}</p>
             <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
             <div class="comentarios" style="display:none;">
-              ${e.Comentario.map(c => `<div class="comentario">${c.texto}</div>`).join('')}
+              ${e.comentarios.map(c => `<div class="comentario">${c.comentario}</div>`).join('')}
             </div>
           `;
+
           list.appendChild(div);
         });
       } catch (error) {
@@ -121,8 +123,7 @@
     }
 
     function logout() {
-      // Redireciona para a página de login
-      window.location.href = "index.html";
+      window.location.href = "index.html"; // volta para a página de login
     }
 
     fetchEquipamentos();
