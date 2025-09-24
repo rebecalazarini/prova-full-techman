@@ -9,14 +9,30 @@
     header { background: #44babc; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     header h1 { margin: 0; font-size: 24px; }
     header button { padding: 8px 12px; border: none; border-radius: 6px; background: #35797d; color: white; cursor: pointer; }
+
     main { padding: 20px; max-width: 900px; margin: 0 auto; }
+
     .equipamento { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
     .equipamento img { max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 10px; }
-    .comentarios { margin-top: 10px; padding-left: 15px; }
-    .comentario { background: #f0f0f0; margin-bottom: 5px; padding: 5px 8px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+
     .btn { cursor: pointer; padding: 5px 8px; border: none; border-radius: 5px; color: white; }
-    .btn-excluir { background: #dc3545; }
-    .ver-comentarios { margin-top: 10px; background: #44babc; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+    .btn-excluir { background: #dc3545; margin-left: 5px; }
+    .btn-comentarios { background: #44babc; margin-left: 5px; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background: white; margin: 50px auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; position: relative; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; }
+    .modal-header button { padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+
+    .comentario { border-bottom: 1px solid #eee; padding: 10px 0; }
+    .comentario-header { font-size: 14px; color: #555; display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .comentario-texto { font-size: 16px; color: #333; }
+
+    .adicionar-comentario { margin-top: 15px; display: flex; gap: 5px; }
+    .adicionar-comentario input { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+    .adicionar-comentario button { padding: 8px 12px; background: #35797d; color: white; border: none; border-radius: 5px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -25,16 +41,32 @@
     <button onclick="logout()">Logout</button>
   </header>
 
-  <main id="equipamentos-list">
-    <!-- Lista de equipamentos será renderizada aqui -->
-  </main>
+  <main id="equipamentos-list"></main>
+
+  <!-- Modal de Comentários -->
+  <div id="comentarios-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Comentários</h2>
+        <button onclick="fecharModal()">X</button>
+      </div>
+      <div id="comentarios-list">
+        <!-- Comentários renderizados aqui -->
+      </div>
+      <div class="adicionar-comentario">
+        <input type="text" id="novo-comentario" placeholder="Digite um comentário">
+        <button onclick="adicionarComentario()">Adicionar</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const API_URL = "http://localhost:3000";
+    let equipamentoAtivo = null;
 
     async function fetchEquipamentos() {
       try {
-        const response = await fetch("http://localhost:3000/equipamento");
+        const response = await fetch(`${API_URL}/equipamento`);
         const equipamentos = await response.json();
         const list = document.getElementById("equipamentos-list");
         list.innerHTML = "";
@@ -47,16 +79,8 @@
             <h2>${e.equipamento}</h2>
             <img src="${e.imagem}" alt="${e.equipamento}">
             <p>${e.descricao}</p>
-            <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
+            <button class="btn btn-comentarios" onclick="abrirModal(${e.id})">Ver Comentários</button>
             <button class="btn btn-excluir" onclick="excluirEquipamento(${e.id})">Excluir Equipamento</button>
-            <div class="comentarios" style="display:none;">
-              ${(e.comentarios || []).map(c => `
-                <div class="comentario">
-                  ${c.comentario}
-                  <button class="btn btn-excluir" onclick="excluirComentario(${c.id}, this)">X</button>
-                </div>
-              `).join('')}
-            </div>
           `;
           list.appendChild(div);
         });
@@ -65,13 +89,68 @@
       }
     }
 
-    function toggleComentarios(btn) {
-      const comentarios = btn.nextElementSibling.nextElementSibling; // Pega a div correta
-      comentarios.style.display = comentarios.style.display === "none" ? "block" : "none";
+    // Modal
+    async function abrirModal(equipamentoId) {
+      try {
+        equipamentoAtivo = equipamentoId;
+        const response = await fetch('http://localhost:3000/equipamento');
+        const equipamento = await response.json();
+
+        const comentarios = (equipamento.comentarios || []).sort((a,b) => new Date(b.data) - new Date(a.data));
+
+        const comentariosList = document.getElementById("comentarios-list");
+        comentariosList.innerHTML = comentarios.map(c => `
+          <div class="comentario">
+            <div class="comentario-header">
+              <span>Perfil: ${c.comentarioPerfil.perfil}</span>
+              <span>${new Date(c.data).toLocaleString()}</span>
+            </div>
+            <div class="comentario-texto">${c.comentario}</div>
+            <button class="btn btn-excluir" onclick="excluirComentario(${c.id}, this)">Excluir</button>
+          </div>
+        `).join('');
+
+        document.getElementById("comentarios-modal").style.display = "block";
+      } catch(err) {
+        console.error("Erro ao abrir modal de comentários:", err);
+      }
     }
 
-    function logout() {
-      window.location.href = "index.html"; 
+    function fecharModal() {
+      document.getElementById("comentarios-modal").style.display = "none";
+      document.getElementById("novo-comentario").value = "";
+    }
+
+    async function adicionarComentario() {
+      const texto = document.getElementById("novo-comentario").value.trim();
+      if(!texto) return alert("Digite um comentário!");
+
+      try {
+        // POST para sua API (supondo rota /comentario)
+        const response = await fetch('http://localhost:3000/comentarios', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comentario: texto, equipamento: equipamentoAtivo, perfil: 1 }) // perfil = 1 admin
+        });
+        const novo = await response.json();
+
+        // Atualiza a lista do modal
+        const comentariosList = document.getElementById("comentarios-list");
+        comentariosList.innerHTML = `
+          <div class="comentario">
+            <div class="comentario-header">
+              <span>Perfil: ${novo.comentarioPerfil.perfil}</span>
+              <span>${new Date(novo.data).toLocaleString()}</span>
+            </div>
+            <div class="comentario-texto">${novo.comentario}</div>
+            <button class="btn btn-excluir" onclick="excluirComentario(${novo.id}, this)">Excluir</button>
+          </div>
+        ` + comentariosList.innerHTML;
+
+        document.getElementById("novo-comentario").value = "";
+      } catch(err) {
+        console.error(err);
+      }
     }
 
     async function excluirEquipamento(id) {
@@ -79,18 +158,19 @@
       try {
         await fetch(`${API_URL}/equipamento/${id}`, { method: "DELETE" });
         fetchEquipamentos();
-      } catch (err) {
-        console.error("Erro ao excluir equipamento:", err);
-      }
+      } catch(err) { console.error(err); }
     }
+
     async function excluirComentario(id, btn) {
       if(!confirm("Deseja realmente excluir este comentário?")) return;
       try {
         await fetch(`${API_URL}/comentario/${id}`, { method: "DELETE" });
         btn.parentElement.remove();
-      } catch (err) {
-        console.error("Erro ao excluir comentário:", err);
-      }
+      } catch(err) { console.error(err); }
+    }
+
+    function logout() {
+      window.location.href = "index.html";
     }
 
     fetchEquipamentos();
