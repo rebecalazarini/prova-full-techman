@@ -7,42 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Equipamento{
-  id          Int      @id @default(autoincrement())
-  nome        String
-  descricao   String
-  imagem    String
-  status      String
-  data_inclusao DateTime @default(now())
-  comentarios Comentario[]
-}
-
-model Usuario{
-  id          Int      @id @default(autoincrement())
-  nome        String
-  email       String   @unique
-  senha       String
-  perfil     Int
-  usuarioPerfil Perfil @relation(fields: [perfil], references: [id])
-  comentarios Comentario[]
-}
-
-model Comentario {
-  id          Int      @id @default(autoincrement())
-  comentario  String
-  data_inclusao DateTime @default(now())
-  usuario_id Int
-  equipamento_id Int
-  perfil Int
-  comentarioPerfil         Perfil      @relation(fields: [perfil], references: [id])
-  usuario    Usuario   @relation(fields: [usuario_id], references: [id])
-  equipamento Equipamento @relation(fields: [equipamento_id], references: [id])
-}
-
-
 model Perfil {
   id          Int          @id @default(autoincrement())
   perfil      String       @db.VarChar(50)
   usuarios    Usuario[]
   comentarios Comentario[]
+}
+
+model Usuario {
+  id            Int    @id @default(autoincrement())
+  senha         String @db.VarChar(50)
+  perfil        Int
+  usuarioPerfil Perfil @relation(fields: [perfil], references: [id])
+}
+
+model Equipamento {
+  id          Int          @id @default(autoincrement())
+  equipamento String       @db.VarChar(255)
+  imagem      String       @db.VarChar(255)
+  descricao   String       @db.Text
+  ativo       Int
+  data        DateTime     @default(now())
+  comentarios Comentario[]
+}
+
+model Comentario {
+  id                    Int         @id @default(autoincrement())
+  comentario            String      @db.Text
+  equipamento           Int
+  perfil                Int
+  data                  DateTime    @default(now())
+  comentarioPerfil      Perfil      @relation(fields: [perfil], references: [id])
+  comentarioEquipamento Equipamento @relation(fields: [equipamento], references: [id], onDelete: Cascade)
 }
