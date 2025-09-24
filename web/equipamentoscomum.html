@@ -106,7 +106,7 @@
         <p>${e.descricao}</p>
         <button class="ver-comentarios" onclick="toggleComentarios(this)">Ver Comentários</button>
         <div class="comentarios" style="display:none;">
-          ${(e.comentarios || []).map(c => `<div class="comentario">${c.comentario}</div>`).join('')}
+        ${(e.comentarios || []).map(c => `<div class="comentario">${c.comentario}</div>`).join('')}
         </div>
       `;
 
