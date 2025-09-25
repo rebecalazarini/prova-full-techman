@@ -17,7 +17,7 @@ npm i
 ```bash
 DATABASE_URL="mysql://root@localhost:3306/techman" 
 ```
-- Rode o comando para criar as tabelas no banco de dados.
+- De start no mysql e rode o comando para criar as tabelas no banco de dados.
 ```bash
 npx prisma migrate dev --name init
 ```
