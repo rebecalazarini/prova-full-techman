@@ -26,8 +26,10 @@ npx prisma migrate dev --name init
 npx nodemon server.js 
 ```
 
-print dos diagramas
+## print dos diagramas
 
 ![i1](../docs/der.png)
 ![i2](../docs/Login.png)
+
+
 
